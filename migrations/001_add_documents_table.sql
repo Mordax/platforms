@@ -1,18 +1,7 @@
--- Create subdomains table
-CREATE TABLE IF NOT EXISTS subdomains (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) UNIQUE NOT NULL,
-    created_at BIGINT NOT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+-- Migration: Transform emoji-based tenant system to REST API endpoint system
+-- Date: 2025-11-17
 
--- Create index on name for faster lookups
-CREATE INDEX IF NOT EXISTS idx_subdomains_name ON subdomains(name);
-
--- Create index on created_at for sorting
-CREATE INDEX IF NOT EXISTS idx_subdomains_created_at ON subdomains(created_at DESC);
-
--- Create documents table for storing JSON data
+-- Step 1: Create documents table for storing JSON data
 CREATE TABLE IF NOT EXISTS documents (
     id SERIAL PRIMARY KEY,
     subdomain_name VARCHAR(255) NOT NULL,
@@ -25,12 +14,15 @@ CREATE TABLE IF NOT EXISTS documents (
         ON DELETE CASCADE
 );
 
--- Create indexes for documents table
+-- Step 2: Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_documents_subdomain ON documents(subdomain_name);
 CREATE INDEX IF NOT EXISTS idx_documents_data ON documents USING GIN(data);
 CREATE INDEX IF NOT EXISTS idx_documents_created_at ON documents(created_at DESC);
 
--- Create trigger function to auto-update updated_at timestamp
+-- Step 3: Remove emoji column from subdomains table
+ALTER TABLE subdomains DROP COLUMN IF EXISTS emoji;
+
+-- Step 4: Create trigger to auto-update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -39,7 +31,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
--- Create trigger for documents table
 CREATE TRIGGER update_documents_updated_at
     BEFORE UPDATE ON documents
     FOR EACH ROW

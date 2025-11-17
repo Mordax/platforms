@@ -1,7 +1,6 @@
 'use server';
 
 import { db } from '@/lib/postgres';
-import { isValidIcon } from '@/lib/subdomains';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { rootDomain, protocol } from '@/lib/utils';
@@ -11,19 +10,9 @@ export async function createSubdomainAction(
   formData: FormData
 ) {
   const subdomain = formData.get('subdomain') as string;
-  const icon = formData.get('icon') as string;
 
-  if (!subdomain || !icon) {
-    return { success: false, error: 'Subdomain and icon are required' };
-  }
-
-  if (!isValidIcon(icon)) {
-    return {
-      subdomain,
-      icon,
-      success: false,
-      error: 'Please enter a valid emoji (maximum 10 characters)'
-    };
+  if (!subdomain) {
+    return { success: false, error: 'Subdomain name is required' };
   }
 
   const sanitizedSubdomain = subdomain.toLowerCase().replace(/[^a-z0-9-]/g, '');
@@ -31,10 +20,17 @@ export async function createSubdomainAction(
   if (sanitizedSubdomain !== subdomain) {
     return {
       subdomain,
-      icon,
       success: false,
       error:
         'Subdomain can only have lowercase letters, numbers, and hyphens. Please try again.'
+    };
+  }
+
+  if (sanitizedSubdomain.length < 1 || sanitizedSubdomain.length > 63) {
+    return {
+      subdomain,
+      success: false,
+      error: 'Subdomain must be between 1 and 63 characters long.'
     };
   }
 
@@ -48,7 +44,6 @@ export async function createSubdomainAction(
     if (existingSubdomain.rows.length > 0) {
       return {
         subdomain,
-        icon,
         success: false,
         error: 'This subdomain is already taken'
       };
@@ -56,14 +51,13 @@ export async function createSubdomainAction(
 
     // Insert new subdomain
     await db.query(
-      'INSERT INTO subdomains (name, emoji, created_at) VALUES ($1, $2, $3)',
-      [sanitizedSubdomain, icon, Date.now()]
+      'INSERT INTO subdomains (name, created_at) VALUES ($1, $2)',
+      [sanitizedSubdomain, Date.now()]
     );
   } catch (error) {
     console.error('Error creating subdomain:', error);
     return {
       subdomain,
-      icon,
       success: false,
       error: 'Failed to create subdomain. Please try again.'
     };

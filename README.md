@@ -101,3 +101,77 @@ For custom domains, make sure to:
 
 1. Add your root domain to Vercel
 2. Set up a wildcard DNS record (`*.yourdomain.com`) on Vercel
+
+---
+## How to use the new API endpoint creation
+🚀 How to Use
+
+1. Create an API Endpoint
+
+# Visit http://localhost:3000
+# Enter "users" as the endpoint name
+# Click "Create API Endpoint"
+
+2. Use the REST API
+
+Via UI:
+- Visit http://users.localhost:3000
+- Use the interactive interface to Create/Read/Update/Delete documents
+
+Via cURL/Postman:
+# Create a document
+curl -X POST http://localhost:3000/api/users \
+-H "Content-Type: application/json" \
+-d '{"name": "John Doe", "email": "john@example.com"}'
+
+# List all documents
+curl http://localhost:3000/api/users
+
+# Get specific document
+curl http://localhost:3000/api/users/1
+
+# Update document
+curl -X PUT http://localhost:3000/api/users/1 \
+-H "Content-Type: application/json" \
+-d '{"name": "Jane Doe", "email": "jane@example.com"}'
+
+# Delete document
+curl -X DELETE http://localhost:3000/api/users/1
+
+  ---
+📋 API Endpoints Reference
+
+| Method | Endpoint             | Description                                          |
+  |--------|----------------------|------------------------------------------------------|
+| GET    | /api/{subdomain}     | List all documents (pagination: ?limit=100&offset=0) |
+| POST   | /api/{subdomain}     | Create new document                                  |
+| GET    | /api/{subdomain}/:id | Get single document                                  |
+| PUT    | /api/{subdomain}/:id | Update document                                      |
+| DELETE | /api/{subdomain}/:id | Delete document                                      |
+
+  ---
+✨ Features
+
+- ✅ JSON Validation - Ensures only valid JSON objects are stored
+- ✅ Pagination - Default limit of 100 documents per request
+- ✅ JSONB Storage - Efficient PostgreSQL JSONB column with GIN indexing
+- ✅ Auto Timestamps - created_at and updated_at automatically managed
+- ✅ Cascade Deletes - Deleting an endpoint removes all its documents
+- ✅ Interactive UI - Test CRUD operations directly in the browser
+- ✅ Document Counts - Admin dashboard shows document count per endpoint
+- ✅ Error Handling - Proper HTTP status codes and error messages
+
+  ---
+🔍 Testing It Out
+
+1. Start the dev server:
+   pnpm dev
+2. Create a "users" endpoint:
+   - Go to http://localhost:3000
+   - Enter "users" and create
+3. Try the UI:
+   - Visit http://users.localhost:3000
+   - Create some test documents using the form
+4. Check the admin:
+   - Visit http://localhost:3000/admin
+   - See your endpoint with document count

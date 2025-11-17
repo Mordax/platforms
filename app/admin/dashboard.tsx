@@ -10,8 +10,8 @@ import { rootDomain, protocol } from '@/lib/utils';
 
 type Tenant = {
   subdomain: string;
-  emoji: string;
   createdAt: number;
+  documentCount?: number;
 };
 
 type DeleteState = {
@@ -86,21 +86,31 @@ function TenantGrid({
             </div>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between">
-              <div className="text-4xl">{tenant.emoji}</div>
-              <div className="text-sm text-gray-500">
-                Created: {new Date(tenant.createdAt).toLocaleDateString()}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600">
+                  <span className="font-semibold">{tenant.documentCount ?? 0}</span> documents
+                </div>
+                <div className="text-sm text-gray-500">
+                  {new Date(tenant.createdAt).toLocaleDateString()}
+                </div>
               </div>
-            </div>
-            <div className="mt-4">
-              <a
-                href={`${protocol}://${tenant.subdomain}.${rootDomain}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-500 hover:underline text-sm"
-              >
-                Visit subdomain →
-              </a>
+              <div className="pt-2 border-t space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-gray-500">API:</span>
+                  <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                    /api/{tenant.subdomain}
+                  </code>
+                </div>
+                <a
+                  href={`${protocol}://${tenant.subdomain}.${rootDomain}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:underline text-sm inline-block"
+                >
+                  Open UI →
+                </a>
+              </div>
             </div>
           </CardContent>
         </Card>
