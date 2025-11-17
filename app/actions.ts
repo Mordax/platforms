@@ -1,6 +1,6 @@
 'use server';
 
-import { redis } from '@/lib/redis';
+import { db } from '@/lib/postgres';
 import { isValidIcon } from '@/lib/subdomains';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -38,22 +38,36 @@ export async function createSubdomainAction(
     };
   }
 
-  const subdomainAlreadyExists = await redis.get(
-    `subdomain:${sanitizedSubdomain}`
-  );
-  if (subdomainAlreadyExists) {
+  try {
+    // Check if subdomain already exists
+    const existingSubdomain = await db.query(
+      'SELECT name FROM subdomains WHERE name = $1',
+      [sanitizedSubdomain]
+    );
+
+    if (existingSubdomain.rows.length > 0) {
+      return {
+        subdomain,
+        icon,
+        success: false,
+        error: 'This subdomain is already taken'
+      };
+    }
+
+    // Insert new subdomain
+    await db.query(
+      'INSERT INTO subdomains (name, emoji, created_at) VALUES ($1, $2, $3)',
+      [sanitizedSubdomain, icon, Date.now()]
+    );
+  } catch (error) {
+    console.error('Error creating subdomain:', error);
     return {
       subdomain,
       icon,
       success: false,
-      error: 'This subdomain is already taken'
+      error: 'Failed to create subdomain. Please try again.'
     };
   }
-
-  await redis.set(`subdomain:${sanitizedSubdomain}`, {
-    emoji: icon,
-    createdAt: Date.now()
-  });
 
   redirect(`${protocol}://${sanitizedSubdomain}.${rootDomain}`);
 }
@@ -63,7 +77,13 @@ export async function deleteSubdomainAction(
   formData: FormData
 ) {
   const subdomain = formData.get('subdomain');
-  await redis.del(`subdomain:${subdomain}`);
-  revalidatePath('/admin');
-  return { success: 'Domain deleted successfully' };
+
+  try {
+    await db.query('DELETE FROM subdomains WHERE name = $1', [subdomain]);
+    revalidatePath('/admin');
+    return { success: 'Domain deleted successfully' };
+  } catch (error) {
+    console.error('Error deleting subdomain:', error);
+    return { success: false, error: 'Failed to delete domain' };
+  }
 }
