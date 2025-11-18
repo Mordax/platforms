@@ -1,0 +1,188 @@
+import { db } from '@/lib/postgres';
+
+export type Document = {
+  id: number;
+  subdomain_name: string;
+  collection_name: string;
+  data: any;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PaginatedResult<T> = {
+  data: T[];
+  total: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+};
+
+/**
+ * Validate JSON data
+ * Ensures the data is a valid JSON object
+ */
+export function isValidJSON(data: any): boolean {
+  if (typeof data !== 'object' || data === null || Array.isArray(data)) {
+    return false;
+  }
+  try {
+    // Try to stringify and parse to ensure it's valid JSON
+    JSON.parse(JSON.stringify(data));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Create a new document for a subdomain collection
+ */
+export async function createDocument(
+  subdomain: string,
+  collection: string,
+  data: any
+): Promise<Document | null> {
+  if (!isValidJSON(data)) {
+    throw new Error('Invalid JSON data. Must be a valid JSON object.');
+  }
+
+  try {
+    const result = await db.query<Document>(
+      'INSERT INTO documents (subdomain_name, collection_name, data) VALUES ($1, $2, $3) RETURNING *',
+      [subdomain, collection, JSON.stringify(data)]
+    );
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    return {
+      ...result.rows[0],
+      data: result.rows[0].data
+    };
+  } catch (error) {
+    console.error('Error creating document:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get all documents for a subdomain collection with pagination
+ */
+export async function getDocuments(
+  subdomain: string,
+  collection: string,
+  limit: number = 100,
+  offset: number = 0
+): Promise<PaginatedResult<Document>> {
+  try {
+    // Get total count
+    const countResult = await db.query<{ count: string }>(
+      'SELECT COUNT(*) as count FROM documents WHERE subdomain_name = $1 AND collection_name = $2',
+      [subdomain, collection]
+    );
+    const total = parseInt(countResult.rows[0]?.count || '0');
+
+    // Get paginated documents
+    const result = await db.query<Document>(
+      'SELECT * FROM documents WHERE subdomain_name = $1 AND collection_name = $2 ORDER BY created_at DESC LIMIT $3 OFFSET $4',
+      [subdomain, collection, limit, offset]
+    );
+
+    return {
+      data: result.rows.map(row => ({
+        ...row,
+        data: row.data
+      })),
+      total,
+      limit,
+      offset,
+      hasMore: offset + limit < total
+    };
+  } catch (error) {
+    console.error('Error fetching documents:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get a single document by ID for a specific subdomain collection
+ */
+export async function getDocument(
+  subdomain: string,
+  collection: string,
+  id: number
+): Promise<Document | null> {
+  try {
+    const result = await db.query<Document>(
+      'SELECT * FROM documents WHERE subdomain_name = $1 AND collection_name = $2 AND id = $3',
+      [subdomain, collection, id]
+    );
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    return {
+      ...result.rows[0],
+      data: result.rows[0].data
+    };
+  } catch (error) {
+    console.error('Error fetching document:', error);
+    throw error;
+  }
+}
+
+/**
+ * Update a document by ID for a specific subdomain collection
+ */
+export async function updateDocument(
+  subdomain: string,
+  collection: string,
+  id: number,
+  data: any
+): Promise<Document | null> {
+  if (!isValidJSON(data)) {
+    throw new Error('Invalid JSON data. Must be a valid JSON object.');
+  }
+
+  try {
+    const result = await db.query<Document>(
+      'UPDATE documents SET data = $1, updated_at = CURRENT_TIMESTAMP WHERE subdomain_name = $2 AND collection_name = $3 AND id = $4 RETURNING *',
+      [JSON.stringify(data), subdomain, collection, id]
+    );
+
+    if (result.rows.length === 0) {
+      return null;
+    }
+
+    return {
+      ...result.rows[0],
+      data: result.rows[0].data
+    };
+  } catch (error) {
+    console.error('Error updating document:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete a document by ID for a specific subdomain collection
+ */
+export async function deleteDocument(
+  subdomain: string,
+  collection: string,
+  id: number
+): Promise<boolean> {
+  try {
+    const result = await db.query(
+      'DELETE FROM documents WHERE subdomain_name = $1 AND collection_name = $2 AND id = $3',
+      [subdomain, collection, id]
+    );
+
+    return (result.rowCount ?? 0) > 0;
+  } catch (error) {
+    console.error('Error deleting document:', error);
+    throw error;
+  }
+}

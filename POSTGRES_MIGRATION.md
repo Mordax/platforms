@@ -186,3 +186,45 @@ This setup uses Docker for local development. For production deployment:
 4. Add database migrations tooling (e.g., Prisma, Drizzle, or raw SQL scripts)
 5. Implement proper error handling and retries
 6. Set up database backups and monitoring
+
+---
+## To directly access the postgres via command line in docker:
+docker exec -it multitenant_postgres psql -U multitenant_user -d multitenant_db
+
+Explanation:
+- -U multitenant_user → Username
+- -d multitenant_db → Database name (not password!)
+
+When you exec into the container, you don't need to provide the password because you're already
+inside the container's environment.
+
+  ---
+Useful PostgreSQL Commands Once You're In:
+
+-- List all tables
+\dt
+
+-- Describe subdomains table structure
+\d subdomains
+
+-- Describe documents table structure
+\d documents
+
+-- View all subdomains
+SELECT * FROM subdomains;
+
+-- View all documents
+SELECT * FROM documents;
+
+-- View documents with pretty JSON formatting
+SELECT id, subdomain_name, jsonb_pretty(data) as data, created_at
+FROM documents;
+
+-- Count documents per subdomain
+SELECT subdomain_name, COUNT(*) as count
+FROM documents
+GROUP BY subdomain_name;
+
+-- Exit psql
+\q
+
