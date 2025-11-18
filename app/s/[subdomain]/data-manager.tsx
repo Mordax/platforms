@@ -84,6 +84,13 @@ export function DataManager({
 
       setJsonInput('');
       fetchDocuments(activeCollection);
+
+      // Update collection count
+      setCollections(prev => prev.map(c =>
+        c.name === activeCollection
+          ? { ...c, documentCount: c.documentCount + 1 }
+          : c
+      ));
     } catch (err) {
       setError('Invalid JSON format');
     }
@@ -122,6 +129,13 @@ export function DataManager({
     try {
       await fetch(`/api/${activeCollection}/${id}`, { method: 'DELETE' });
       fetchDocuments(activeCollection);
+
+      // Update collection count
+      setCollections(prev => prev.map(c =>
+        c.name === activeCollection
+          ? { ...c, documentCount: Math.max(0, c.documentCount - 1) }
+          : c
+      ));
     } catch (err) {
       console.error('Failed to delete document:', err);
     }

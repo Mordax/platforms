@@ -78,6 +78,6 @@ export async function deleteSubdomainAction(
     return { success: 'Domain deleted successfully' };
   } catch (error) {
     console.error('Error deleting subdomain:', error);
-    return { success: false, error: 'Failed to delete domain' };
+    return { error: 'Failed to delete domain' };
   }
 }

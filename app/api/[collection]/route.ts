@@ -6,28 +6,7 @@ import {
   createDocument,
   isValidJSON
 } from '@/lib/documents';
-
-/**
- * Extract subdomain from request headers
- */
-function extractSubdomain(request: NextRequest): string | null {
-  const host = request.headers.get('host') || '';
-  const hostname = host.split(':')[0];
-
-  // Local development
-  if (hostname.includes('.localhost')) {
-    return hostname.split('.')[0];
-  }
-
-  // Production - extract subdomain from hostname
-  // This assumes the subdomain is the first part before the root domain
-  const parts = hostname.split('.');
-  if (parts.length > 2) {
-    return parts[0];
-  }
-
-  return null;
-}
+import { extractSubdomain } from '@/lib/utils';
 
 /**
  * GET /api/[collection]

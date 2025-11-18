@@ -46,25 +46,6 @@ export async function getCollection(
 }
 
 /**
- * Get all collections for a subdomain
- */
-export async function getAllCollections(
-  subdomain: string
-): Promise<Collection[]> {
-  try {
-    const result = await db.query<Collection>(
-      'SELECT * FROM collections WHERE subdomain_name = $1 ORDER BY created_at ASC',
-      [subdomain]
-    );
-
-    return result.rows;
-  } catch (error) {
-    console.error('Error fetching collections:', error);
-    return [];
-  }
-}
-
-/**
  * Get all collections with document counts for a subdomain
  */
 export async function getCollectionsWithCounts(
@@ -114,43 +95,6 @@ export async function createCollection(
   } catch (error) {
     console.error('Error creating collection:', error);
     throw error;
-  }
-}
-
-/**
- * Delete a collection and all its documents
- */
-export async function deleteCollection(
-  subdomain: string,
-  collectionName: string
-): Promise<boolean> {
-  try {
-    const result = await db.query(
-      'DELETE FROM collections WHERE subdomain_name = $1 AND name = $2',
-      [subdomain, collectionName]
-    );
-
-    return (result.rowCount ?? 0) > 0;
-  } catch (error) {
-    console.error('Error deleting collection:', error);
-    return false;
-  }
-}
-
-/**
- * Get collection count for a subdomain
- */
-export async function getCollectionCount(subdomain: string): Promise<number> {
-  try {
-    const result = await db.query<{ count: string }>(
-      'SELECT COUNT(*) as count FROM collections WHERE subdomain_name = $1',
-      [subdomain]
-    );
-
-    return parseInt(result.rows[0]?.count || '0');
-  } catch (error) {
-    console.error('Error getting collection count:', error);
-    return 0;
   }
 }
 
