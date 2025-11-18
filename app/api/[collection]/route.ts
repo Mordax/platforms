@@ -89,7 +89,25 @@ export async function GET(
 
     const result = await getDocuments(subdomain, collection, limit, offset);
 
-    return NextResponse.json(result, { status: 200 });
+    // Transform to clean API response
+    const cleanData = result.data.map(doc => ({
+      id: doc.id,
+      ...doc.data,
+      _meta: {
+        created_at: doc.created_at,
+        updated_at: doc.updated_at
+      }
+    }));
+
+    return NextResponse.json({
+      data: cleanData,
+      pagination: {
+        total: result.total,
+        limit: result.limit,
+        offset: result.offset,
+        hasMore: result.hasMore
+      }
+    }, { status: 200 });
   } catch (error) {
     console.error('GET error:', error);
     return NextResponse.json(
@@ -171,7 +189,15 @@ export async function POST(
       );
     }
 
-    return NextResponse.json(document, { status: 201 });
+    // Return clean response with data at top level
+    return NextResponse.json({
+      id: document.id,
+      ...document.data,
+      _meta: {
+        created_at: document.created_at,
+        updated_at: document.updated_at
+      }
+    }, { status: 201 });
   } catch (error: any) {
     console.error('POST error:', error);
 

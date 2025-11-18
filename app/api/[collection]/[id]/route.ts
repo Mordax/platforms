@@ -85,7 +85,15 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(document, { status: 200 });
+    // Return clean response with data at top level
+    return NextResponse.json({
+      id: document.id,
+      ...document.data,
+      _meta: {
+        created_at: document.created_at,
+        updated_at: document.updated_at
+      }
+    }, { status: 200 });
   } catch (error) {
     console.error('GET error:', error);
     return NextResponse.json(
@@ -170,7 +178,15 @@ export async function PUT(
       );
     }
 
-    return NextResponse.json(document, { status: 200 });
+    // Return clean response with data at top level
+    return NextResponse.json({
+      id: document.id,
+      ...document.data,
+      _meta: {
+        created_at: document.created_at,
+        updated_at: document.updated_at
+      }
+    }, { status: 200 });
   } catch (error: any) {
     console.error('PUT error:', error);
 

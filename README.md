@@ -109,18 +109,21 @@ For custom domains, make sure to:
 1. Create an API Endpoint
 
 # Visit http://localhost:3000
-# Enter "users" as the endpoint name
+# Enter "howdy" as the endpoint name
 # Click "Create API Endpoint"
 
 2. Use the REST API
 
 Via UI:
-- Visit http://users.localhost:3000
+- Visit http://howdy.localhost:3000
 - Use the interactive interface to Create/Read/Update/Delete documents
+- create the collections you need, tabs are created for each collection (like users for example)
+- note: there is an id and a _meta object containing created and updated information for each created json document.
 
 Via cURL/Postman:
 # Create a document
-curl -X POST http://localhost:3000/api/users \
+curl -X POST http://127.0.0.1:3000/api/users \
+-H "Host: howdy.localhost:3000" \
 -H "Content-Type: application/json" \
 -d '{"name": "John Doe", "email": "john@example.com"}'
 
@@ -129,15 +132,18 @@ curl http://127.0.0.1:3000/api/users \
 -H "Host: howdy.localhost:3000"
 
 # Get specific document
-curl http://localhost:3000/api/users/1
+curl http://127.0.0.1:3000/api/users/1 \
+-H "Host: howdy.localhost:3000"
 
 # Update document
-curl -X PUT http://localhost:3000/api/users/1 \
+curl -X PUT http://127.0.0.1:3000/api/users/1 \
+-H "Host: howdy.localhost:3000" \
 -H "Content-Type: application/json" \
 -d '{"name": "Jane Doe", "email": "jane@example.com"}'
 
 # Delete document
-curl -X DELETE http://localhost:3000/api/users/1
+curl -X DELETE http://127.0.0.1:3000/api/users/1 \
+-H "Host: howdy.localhost:3000"
 
   ---
 📋 API Endpoints Reference
@@ -167,12 +173,12 @@ curl -X DELETE http://localhost:3000/api/users/1
 
 1. Start the dev server:
    pnpm dev
-2. Create a "users" endpoint:
+2. Create a "howdy" subdomain project endpoint:
    - Go to http://localhost:3000
-   - Enter "users" and create
+   - Enter "howdy" and create
 3. Try the UI:
-   - Visit http://users.localhost:3000
-   - Create some test documents using the form
+   - Visit http://howdy.localhost:3000
+   - Create some test collections and documents using the form
 4. Check the admin:
    - Visit http://localhost:3000/admin
    - See your endpoint with document count

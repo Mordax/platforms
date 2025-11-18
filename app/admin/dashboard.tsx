@@ -11,7 +11,7 @@ import { rootDomain, protocol } from '@/lib/utils';
 type Tenant = {
   subdomain: string;
   createdAt: number;
-  documentCount?: number;
+  collectionCount?: number;
 };
 
 type DeleteState = {
@@ -89,7 +89,7 @@ function TenantGrid({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-600">
-                  <span className="font-semibold">{tenant.documentCount ?? 0}</span> documents
+                  <span className="font-semibold">{tenant.collectionCount ?? 0}</span> collections
                 </div>
                 <div className="text-sm text-gray-500">
                   {new Date(tenant.createdAt).toLocaleDateString()}
@@ -99,7 +99,7 @@ function TenantGrid({
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-gray-500">API:</span>
                   <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                    /api/{tenant.subdomain}
+                    {tenant.subdomain}.{rootDomain}/api/[collection]
                   </code>
                 </div>
                 <a

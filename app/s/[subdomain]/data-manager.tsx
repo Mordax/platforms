@@ -9,10 +9,11 @@ import { Trash2, Loader2, Plus, Edit2, X, Database } from 'lucide-react';
 
 type Document = {
   id: number;
-  collection_name: string;
-  data: any;
-  created_at: string;
-  updated_at: string;
+  _meta: {
+    created_at: string;
+    updated_at: string;
+  };
+  [key: string]: any; // User data fields spread at top level
 };
 
 type Collection = {
@@ -128,7 +129,11 @@ export function DataManager({
 
   const startEdit = (doc: Document) => {
     setEditingId(doc.id);
-    setJsonInput(JSON.stringify(doc.data, null, 2));
+    // Extract only the data fields (exclude id and _meta)
+    // Handle both old and new document formats
+    const { id, _meta, collection_name, subdomain_name, created_at, updated_at, data, ...rest } = doc as any;
+    const editData = data || rest; // Use data field if exists (old format), otherwise use rest (new format)
+    setJsonInput(JSON.stringify(editData, null, 2));
     setError('');
   };
 
@@ -411,11 +416,14 @@ export function DataManager({
                   ) : (
                     <>
                       <pre className="bg-gray-50 p-4 rounded-md overflow-x-auto text-sm">
-                        <code>{JSON.stringify(doc.data, null, 2)}</code>
+                        <code>{JSON.stringify((() => {
+                          const { id, _meta, collection_name, subdomain_name, created_at, updated_at, data, ...rest } = doc as any;
+                          return data || rest; // Use data field if exists (old format), otherwise use rest (new format)
+                        })(), null, 2)}</code>
                       </pre>
                       <div className="flex gap-4 mt-3 text-xs text-gray-500">
-                        <span>Created: {new Date(doc.created_at).toLocaleString()}</span>
-                        <span>Updated: {new Date(doc.updated_at).toLocaleString()}</span>
+                        <span>Created: {new Date((doc as any)._meta?.created_at || (doc as any).created_at).toLocaleString()}</span>
+                        <span>Updated: {new Date((doc as any)._meta?.updated_at || (doc as any).updated_at).toLocaleString()}</span>
                       </div>
                     </>
                   )}

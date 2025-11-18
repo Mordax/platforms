@@ -1,5 +1,5 @@
 import { getAllSubdomains } from '@/lib/subdomains';
-import { getAllDocumentCounts } from '@/lib/documents';
+import { getAllCollectionCounts } from '@/lib/collections';
 import type { Metadata } from 'next';
 import { AdminDashboard } from './dashboard';
 import { rootDomain } from '@/lib/utils';
@@ -12,12 +12,12 @@ export const metadata: Metadata = {
 export default async function AdminPage() {
   // TODO: You can add authentication here with your preferred auth provider
   const subdomains = await getAllSubdomains();
-  const documentCounts = await getAllDocumentCounts();
+  const collectionCounts = await getAllCollectionCounts();
 
-  // Merge document counts with subdomain data
+  // Merge collection counts with subdomain data
   const tenants = subdomains.map(subdomain => ({
     ...subdomain,
-    documentCount: documentCounts[subdomain.subdomain] || 0
+    collectionCount: collectionCounts[subdomain.subdomain] || 0
   }));
 
   return (
