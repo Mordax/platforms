@@ -108,9 +108,9 @@ For custom domains, make sure to:
 
 1. Create an API Endpoint
 
-# Visit http://localhost:3000
-# Enter "howdy" as the endpoint name
-# Click "Create API Endpoint"
+- Visit http://localhost:3000
+- Enter "howdy" as the endpoint name
+- Click "Create API Endpoint"
 
 2. Use the REST API
 
@@ -121,32 +121,39 @@ Via UI:
 - note: there is an id and a _meta object containing created and updated information for each created json document.
 
 Via cURL/Postman:
-# Create a document
+### Create a document
+```bash
 curl -X POST http://127.0.0.1:3000/api/users \
 -H "Host: howdy.localhost:3000" \
 -H "Content-Type: application/json" \
 -d '{"name": "John Doe", "email": "john@example.com"}'
+```
 
-# List all documents
+### List all documents
+```bash
 curl http://127.0.0.1:3000/api/users \
 -H "Host: howdy.localhost:3000"
-
-# Get specific document
+```
+### Get specific document
+```bash
 curl http://127.0.0.1:3000/api/users/1 \
 -H "Host: howdy.localhost:3000"
-
-# Update document
+```
+### Update document
+```bash
 curl -X PUT http://127.0.0.1:3000/api/users/1 \
 -H "Host: howdy.localhost:3000" \
 -H "Content-Type: application/json" \
 -d '{"name": "Jane Doe", "email": "jane@example.com"}'
+```
 
-# Delete document
+### Delete document
+```bash
 curl -X DELETE http://127.0.0.1:3000/api/users/1 \
 -H "Host: howdy.localhost:3000"
+```
 
-  ---
-📋 API Endpoints Reference
+## API Endpoints Reference
 
 | Method | Endpoint             | Description                                          |
   |--------|----------------------|------------------------------------------------------|
@@ -157,7 +164,7 @@ curl -X DELETE http://127.0.0.1:3000/api/users/1 \
 | DELETE | /api/{subdomain}/:id | Delete document                                      |
 
   ---
-✨ Features
+## Features
 
 - ✅ JSON Validation - Ensures only valid JSON objects are stored
 - ✅ Pagination - Default limit of 100 documents per request
@@ -168,11 +175,9 @@ curl -X DELETE http://127.0.0.1:3000/api/users/1 \
 - ✅ Document Counts - Admin dashboard shows document count per endpoint
 - ✅ Error Handling - Proper HTTP status codes and error messages
 
-  ---
-🔍 Testing It Out
+### Testing It Out
 
-1. Start the dev server:
-   pnpm dev
+1. Start the dev server:```pnpm dev```
 2. Create a "howdy" subdomain project endpoint:
    - Go to http://localhost:3000
    - Enter "howdy" and create
