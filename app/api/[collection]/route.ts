@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSubdomainData } from '@/lib/subdomains';
+import { createCollection, getCollection, isValidCollectionName } from '@/lib/collections';
 import {
   getDocuments,
   createDocument,
@@ -7,21 +8,61 @@ import {
 } from '@/lib/documents';
 
 /**
- * GET /api/[subdomain]
- * List all documents for a subdomain with pagination
+ * Extract subdomain from request headers
+ */
+function extractSubdomain(request: NextRequest): string | null {
+  const host = request.headers.get('host') || '';
+  const hostname = host.split(':')[0];
+
+  // Local development
+  if (hostname.includes('.localhost')) {
+    return hostname.split('.')[0];
+  }
+
+  // Production - extract subdomain from hostname
+  // This assumes the subdomain is the first part before the root domain
+  const parts = hostname.split('.');
+  if (parts.length > 2) {
+    return parts[0];
+  }
+
+  return null;
+}
+
+/**
+ * GET /api/[collection]
+ * List all documents for a collection with pagination
+ * Accessed via: subdomain.localhost:3000/api/collection-name
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ subdomain: string }> }
+  { params }: { params: Promise<{ collection: string }> }
 ) {
   try {
-    const { subdomain } = await params;
+    const { collection } = await params;
+    const subdomain = extractSubdomain(request);
+
+    if (!subdomain) {
+      return NextResponse.json(
+        { error: 'Could not determine subdomain from request' },
+        { status: 400 }
+      );
+    }
 
     // Verify subdomain exists
     const subdomainData = await getSubdomainData(subdomain);
     if (!subdomainData) {
       return NextResponse.json(
         { error: 'Subdomain not found' },
+        { status: 404 }
+      );
+    }
+
+    // Verify collection exists
+    const collectionData = await getCollection(subdomain, collection);
+    if (!collectionData) {
+      return NextResponse.json(
+        { error: 'Collection not found' },
         { status: 404 }
       );
     }
@@ -46,7 +87,7 @@ export async function GET(
       );
     }
 
-    const result = await getDocuments(subdomain, limit, offset);
+    const result = await getDocuments(subdomain, collection, limit, offset);
 
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
@@ -59,15 +100,24 @@ export async function GET(
 }
 
 /**
- * POST /api/[subdomain]
- * Create a new document for a subdomain
+ * POST /api/[collection]
+ * Create a new document for a collection (auto-creates collection if needed)
+ * Accessed via: subdomain.localhost:3000/api/collection-name
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ subdomain: string }> }
+  { params }: { params: Promise<{ collection: string }> }
 ) {
   try {
-    const { subdomain } = await params;
+    const { collection } = await params;
+    const subdomain = extractSubdomain(request);
+
+    if (!subdomain) {
+      return NextResponse.json(
+        { error: 'Could not determine subdomain from request' },
+        { status: 400 }
+      );
+    }
 
     // Verify subdomain exists
     const subdomainData = await getSubdomainData(subdomain);
@@ -76,6 +126,20 @@ export async function POST(
         { error: 'Subdomain not found' },
         { status: 404 }
       );
+    }
+
+    // Validate collection name
+    if (!isValidCollectionName(collection)) {
+      return NextResponse.json(
+        { error: 'Invalid collection name. Must be lowercase alphanumeric with hyphens only (1-63 characters).' },
+        { status: 400 }
+      );
+    }
+
+    // Auto-create collection if it doesn't exist
+    let collectionData = await getCollection(subdomain, collection);
+    if (!collectionData) {
+      collectionData = await createCollection(subdomain, collection);
     }
 
     // Parse request body
@@ -98,7 +162,7 @@ export async function POST(
     }
 
     // Create document
-    const document = await createDocument(subdomain, body);
+    const document = await createDocument(subdomain, collection, body);
 
     if (!document) {
       return NextResponse.json(
@@ -111,7 +175,7 @@ export async function POST(
   } catch (error: any) {
     console.error('POST error:', error);
 
-    if (error.message?.includes('Invalid JSON')) {
+    if (error.message?.includes('Invalid')) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 

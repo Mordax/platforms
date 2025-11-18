@@ -125,7 +125,8 @@ curl -X POST http://localhost:3000/api/users \
 -d '{"name": "John Doe", "email": "john@example.com"}'
 
 # List all documents
-curl http://localhost:3000/api/users
+curl http://127.0.0.1:3000/api/users \
+-H "Host: howdy.localhost:3000"
 
 # Get specific document
 curl http://localhost:3000/api/users/1

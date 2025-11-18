@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getSubdomainData } from '@/lib/subdomains';
+import { getCollection } from '@/lib/collections';
 import {
   getDocument,
   updateDocument,
@@ -8,16 +9,46 @@ import {
 } from '@/lib/documents';
 
 /**
- * GET /api/[subdomain]/[id]
+ * Extract subdomain from request headers
+ */
+function extractSubdomain(request: NextRequest): string | null {
+  const host = request.headers.get('host') || '';
+  const hostname = host.split(':')[0];
+
+  // Local development
+  if (hostname.includes('.localhost')) {
+    return hostname.split('.')[0];
+  }
+
+  // Production - extract subdomain from hostname
+  const parts = hostname.split('.');
+  if (parts.length > 2) {
+    return parts[0];
+  }
+
+  return null;
+}
+
+/**
+ * GET /api/[collection]/[id]
  * Get a single document by ID
+ * Accessed via: subdomain.localhost:3000/api/collection-name/123
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ subdomain: string; id: string }> }
+  { params }: { params: Promise<{ collection: string; id: string }> }
 ) {
   try {
-    const { subdomain, id } = await params;
+    const { collection, id } = await params;
+    const subdomain = extractSubdomain(request);
     const documentId = parseInt(id);
+
+    if (!subdomain) {
+      return NextResponse.json(
+        { error: 'Could not determine subdomain from request' },
+        { status: 400 }
+      );
+    }
 
     if (isNaN(documentId)) {
       return NextResponse.json(
@@ -35,8 +66,17 @@ export async function GET(
       );
     }
 
+    // Verify collection exists
+    const collectionData = await getCollection(subdomain, collection);
+    if (!collectionData) {
+      return NextResponse.json(
+        { error: 'Collection not found' },
+        { status: 404 }
+      );
+    }
+
     // Get document
-    const document = await getDocument(subdomain, documentId);
+    const document = await getDocument(subdomain, collection, documentId);
 
     if (!document) {
       return NextResponse.json(
@@ -56,16 +96,25 @@ export async function GET(
 }
 
 /**
- * PUT /api/[subdomain]/[id]
+ * PUT /api/[collection]/[id]
  * Update a document by ID
+ * Accessed via: subdomain.localhost:3000/api/collection-name/123
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ subdomain: string; id: string }> }
+  { params }: { params: Promise<{ collection: string; id: string }> }
 ) {
   try {
-    const { subdomain, id } = await params;
+    const { collection, id } = await params;
+    const subdomain = extractSubdomain(request);
     const documentId = parseInt(id);
+
+    if (!subdomain) {
+      return NextResponse.json(
+        { error: 'Could not determine subdomain from request' },
+        { status: 400 }
+      );
+    }
 
     if (isNaN(documentId)) {
       return NextResponse.json(
@@ -79,6 +128,15 @@ export async function PUT(
     if (!subdomainData) {
       return NextResponse.json(
         { error: 'Subdomain not found' },
+        { status: 404 }
+      );
+    }
+
+    // Verify collection exists
+    const collectionData = await getCollection(subdomain, collection);
+    if (!collectionData) {
+      return NextResponse.json(
+        { error: 'Collection not found' },
         { status: 404 }
       );
     }
@@ -103,7 +161,7 @@ export async function PUT(
     }
 
     // Update document
-    const document = await updateDocument(subdomain, documentId, body);
+    const document = await updateDocument(subdomain, collection, documentId, body);
 
     if (!document) {
       return NextResponse.json(
@@ -128,16 +186,25 @@ export async function PUT(
 }
 
 /**
- * DELETE /api/[subdomain]/[id]
+ * DELETE /api/[collection]/[id]
  * Delete a document by ID
+ * Accessed via: subdomain.localhost:3000/api/collection-name/123
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ subdomain: string; id: string }> }
+  { params }: { params: Promise<{ collection: string; id: string }> }
 ) {
   try {
-    const { subdomain, id } = await params;
+    const { collection, id } = await params;
+    const subdomain = extractSubdomain(request);
     const documentId = parseInt(id);
+
+    if (!subdomain) {
+      return NextResponse.json(
+        { error: 'Could not determine subdomain from request' },
+        { status: 400 }
+      );
+    }
 
     if (isNaN(documentId)) {
       return NextResponse.json(
@@ -155,8 +222,17 @@ export async function DELETE(
       );
     }
 
+    // Verify collection exists
+    const collectionData = await getCollection(subdomain, collection);
+    if (!collectionData) {
+      return NextResponse.json(
+        { error: 'Collection not found' },
+        { status: 404 }
+      );
+    }
+
     // Delete document
-    const success = await deleteDocument(subdomain, documentId);
+    const success = await deleteDocument(subdomain, collection, documentId);
 
     if (!success) {
       return NextResponse.json(
