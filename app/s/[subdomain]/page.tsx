@@ -3,6 +3,8 @@ import { getCollectionsWithCounts } from '@/lib/collections';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { DataManager } from './data-manager';
+import { protocol, rootDomain } from '@/lib/utils';
+import Link from 'next/link';
 
 type Props = {
   params: Promise<{ subdomain: string }>;
@@ -39,6 +41,12 @@ export default async function SubdomainPage({ params }: Props) {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="max-w-6xl mx-auto p-6 md:p-12">
         <div className="mb-8">
+          <Link
+            href={`${protocol}://${rootDomain}`}
+            className="text-sm text-gray-500 hover:text-gray-700 transition-colors mb-4 inline-block"
+          >
+            ← Back to Home
+          </Link>
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
             {subdomain}
           </h1>
