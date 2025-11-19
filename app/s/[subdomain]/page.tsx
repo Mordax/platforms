@@ -6,6 +6,8 @@ import { DataManager } from './data-manager';
 import { protocol, rootDomain } from '@/lib/utils';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 type Props = {
   params: Promise<{ subdomain: string }>;
 };

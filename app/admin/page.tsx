@@ -4,6 +4,8 @@ import type { Metadata } from 'next';
 import { AdminDashboard } from './dashboard';
 import { rootDomain } from '@/lib/utils';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: `Admin Dashboard | ${rootDomain}`,
   description: `Manage API endpoints for ${rootDomain}`
