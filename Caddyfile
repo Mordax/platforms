@@ -1,10 +1,17 @@
+{
+	on_demand_tls {
+		interval 60s
+		burst 5
+	}
+}
+
 {$DOMAIN} {
 	reverse_proxy app:3000
 }
 
-https:// {
-	@subdomains host *.{$DOMAIN}
-	handle @subdomains {
-		reverse_proxy app:3000
+*.{$DOMAIN} {
+	tls {
+		on_demand
 	}
+	reverse_proxy app:3000
 }
