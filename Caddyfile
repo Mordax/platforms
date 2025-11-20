@@ -1,3 +1,10 @@
-*.{$DOMAIN}, {$DOMAIN} {
+{$DOMAIN} {
 	reverse_proxy app:3000
+}
+
+https:// {
+	@subdomains host *.{$DOMAIN}
+	handle @subdomains {
+		reverse_proxy app:3000
+	}
 }
