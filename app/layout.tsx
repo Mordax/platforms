@@ -9,8 +9,8 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: 'Platforms Starter Kit',
-  description: 'Next.js template for building a multi-tenant SaaS.'
+  title: 'Multi-tenant Rest API Generator.',
+  description: 'Sandbox for mocking your backend through JSON.'
 };
 
 export default function RootLayout({
