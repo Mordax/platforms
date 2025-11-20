@@ -12,7 +12,11 @@ RUN npm install -g pnpm
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Set build-time env vars for DB connection (points to host)
+# Build args
+ARG NEXT_PUBLIC_ROOT_DOMAIN
+
+# Set build-time env vars
+ENV NEXT_PUBLIC_ROOT_DOMAIN=$NEXT_PUBLIC_ROOT_DOMAIN
 ENV POSTGRES_HOST=postgres
 ENV POSTGRES_PORT=5432
 ENV POSTGRES_USER=multitenant_user
