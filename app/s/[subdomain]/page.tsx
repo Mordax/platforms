@@ -78,13 +78,13 @@ export default async function SubdomainPage({ params }: Props) {
               <div className="flex items-center gap-3">
                 <span className="text-green-600 font-semibold w-16">GET</span>
                 <code className="bg-gray-100 px-3 py-1 rounded flex-1">
-                  {subdomain}.localhost:3000/api/collection-name
+                  {protocol}://{subdomain}.{rootDomain}/api/collection-name
                 </code>
               </div>
               <div className="flex items-center gap-3 mt-1">
                 <span className="text-blue-600 font-semibold w-16">POST</span>
                 <code className="bg-gray-100 px-3 py-1 rounded flex-1">
-                  {subdomain}.localhost:3000/api/collection-name
+                  {protocol}://{subdomain}.{rootDomain}/api/collection-name
                 </code>
               </div>
             </div>
@@ -93,19 +93,19 @@ export default async function SubdomainPage({ params }: Props) {
               <div className="flex items-center gap-3">
                 <span className="text-green-600 font-semibold w-16">GET</span>
                 <code className="bg-gray-100 px-3 py-1 rounded flex-1">
-                  {subdomain}.localhost:3000/api/collection-name/:id
+                  {protocol}://{subdomain}.{rootDomain}/api/collection-name/:id
                 </code>
               </div>
               <div className="flex items-center gap-3 mt-1">
                 <span className="text-yellow-600 font-semibold w-16">PUT</span>
                 <code className="bg-gray-100 px-3 py-1 rounded flex-1">
-                  {subdomain}.localhost:3000/api/collection-name/:id
+                  {protocol}://{subdomain}.{rootDomain}/api/collection-name/:id
                 </code>
               </div>
               <div className="flex items-center gap-3 mt-1">
                 <span className="text-red-600 font-semibold w-16">DELETE</span>
                 <code className="bg-gray-100 px-3 py-1 rounded flex-1">
-                  {subdomain}.localhost:3000/api/collection-name/:id
+                  {protocol}://{subdomain}.{rootDomain}/api/collection-name/:id
                 </code>
               </div>
             </div>
