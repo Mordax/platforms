@@ -96,9 +96,9 @@ function TenantGrid({
                 </div>
               </div>
               <div className="pt-2 border-t space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500">API:</span>
-                  <code className="text-xs bg-gray-100 px-2 py-1 rounded">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                  <span className="text-xs text-gray-500 shrink-0">API:</span>
+                  <code className="text-xs bg-gray-100 px-2 py-1 rounded overflow-x-auto break-all">
                     {tenant.subdomain}.{rootDomain}/api/[collection]
                   </code>
                 </div>

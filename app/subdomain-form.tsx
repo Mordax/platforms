@@ -22,7 +22,7 @@ function SubdomainInput({ defaultValue }: { defaultValue?: string }) {
           <Input
             id="subdomain"
             name="subdomain"
-            placeholder="users"
+            placeholder="projectname"
             defaultValue={defaultValue}
             className="w-full rounded-r-none focus:z-10"
             required

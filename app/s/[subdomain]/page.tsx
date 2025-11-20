@@ -70,41 +70,41 @@ export default async function SubdomainPage({ params }: Props) {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6 mb-6">
           <h2 className="text-lg font-semibold mb-4 text-gray-900">API Usage</h2>
-          <div className="space-y-3 font-mono text-sm">
+          <div className="space-y-3 font-mono text-xs md:text-sm">
             <div>
               <div className="text-xs text-gray-500 mb-1">Create/List documents in a collection:</div>
-              <div className="flex items-center gap-3">
-                <span className="text-green-600 font-semibold w-16">GET</span>
-                <code className="bg-gray-100 px-3 py-1 rounded flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="text-green-600 font-semibold sm:w-16">GET</span>
+                <code className="bg-gray-100 px-3 py-1 rounded flex-1 overflow-x-auto break-all">
                   {protocol}://{subdomain}.{rootDomain}/api/collection-name
                 </code>
               </div>
-              <div className="flex items-center gap-3 mt-1">
-                <span className="text-blue-600 font-semibold w-16">POST</span>
-                <code className="bg-gray-100 px-3 py-1 rounded flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mt-1">
+                <span className="text-blue-600 font-semibold sm:w-16">POST</span>
+                <code className="bg-gray-100 px-3 py-1 rounded flex-1 overflow-x-auto break-all">
                   {protocol}://{subdomain}.{rootDomain}/api/collection-name
                 </code>
               </div>
             </div>
             <div>
               <div className="text-xs text-gray-500 mb-1">Get/Update/Delete specific document:</div>
-              <div className="flex items-center gap-3">
-                <span className="text-green-600 font-semibold w-16">GET</span>
-                <code className="bg-gray-100 px-3 py-1 rounded flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                <span className="text-green-600 font-semibold sm:w-16">GET</span>
+                <code className="bg-gray-100 px-3 py-1 rounded flex-1 overflow-x-auto break-all">
                   {protocol}://{subdomain}.{rootDomain}/api/collection-name/:id
                 </code>
               </div>
-              <div className="flex items-center gap-3 mt-1">
-                <span className="text-yellow-600 font-semibold w-16">PUT</span>
-                <code className="bg-gray-100 px-3 py-1 rounded flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mt-1">
+                <span className="text-yellow-600 font-semibold sm:w-16">PUT</span>
+                <code className="bg-gray-100 px-3 py-1 rounded flex-1 overflow-x-auto break-all">
                   {protocol}://{subdomain}.{rootDomain}/api/collection-name/:id
                 </code>
               </div>
-              <div className="flex items-center gap-3 mt-1">
-                <span className="text-red-600 font-semibold w-16">DELETE</span>
-                <code className="bg-gray-100 px-3 py-1 rounded flex-1">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mt-1">
+                <span className="text-red-600 font-semibold sm:w-16">DELETE</span>
+                <code className="bg-gray-100 px-3 py-1 rounded flex-1 overflow-x-auto break-all">
                   {protocol}://{subdomain}.{rootDomain}/api/collection-name/:id
                 </code>
               </div>
