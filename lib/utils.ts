@@ -3,7 +3,7 @@ import { twMerge } from 'tailwind-merge';
 import { NextRequest } from 'next/server';
 
 export const protocol =
-  process.env.NODE_ENV === 'production' ? 'https' : 'http';
+  process.env.NEXT_PUBLIC_PROTOCOL || 'http';
 export const rootDomain =
   process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'localhost:3000';
 
